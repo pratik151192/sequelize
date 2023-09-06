@@ -202,6 +202,10 @@ export class AbstractConnectionManager<TConnection extends Connection = Connecti
   }
 
   async _initDatabaseVersion(conn?: TConnection) {
+    if (this.sequelize.dialect.name === 'momento') {
+      return;
+    }
+
     if (this.sequelize.options.databaseVersion != null) {
       return;
     }

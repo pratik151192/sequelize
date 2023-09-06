@@ -346,6 +346,9 @@ export class Sequelize extends SequelizeTypeScript {
       case 'snowflake':
         Dialect = require('./dialects/snowflake').SnowflakeDialect;
         break;
+      case 'momento':
+        Dialect = require('./dialects/momento').MomentoDialect;
+        break;
       default:
         throw new Error(`The dialect ${this.getDialect()} is not supported. Supported dialects: mariadb, mssql, mysql, postgres, sqlite, ibmi, db2 and snowflake.`);
     }
@@ -506,6 +509,24 @@ export class Sequelize extends SequelizeTypeScript {
   define(modelName, attributes = {}, options = {}) {
     options.modelName = modelName;
     options.sequelize = this;
+
+    if (this.dialect.name === 'momento') {
+      let hasPrimaryKey = false;
+
+      for (const key in attributes) {
+        if (attributes[key].primaryKey === true) {
+          hasPrimaryKey = true;
+
+          if (attributes[key].autoIncrement === true) {
+            throw new Error(`In a Momento model, the primary key cannot have 'autoIncrement' set to true.`);
+          }
+        }
+      }
+
+      if (!hasPrimaryKey) {
+        throw new Error(`A Momento model must have a primary key.`);
+      }
+    }
 
     const model = class extends Model {};
 

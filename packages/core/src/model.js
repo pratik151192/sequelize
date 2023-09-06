@@ -117,7 +117,6 @@ export class Model extends ModelTypeScript {
     }
 
     this.constructor.assertIsInitialized();
-
     options = {
       isNewRecord: true,
       _schema: this.constructor.modelDefinition.table.schema,
@@ -847,27 +846,29 @@ ${associationOwner._getAssociationDebugList()}`);
       }
     }
 
-    const existingIndexes = await this.queryInterface.showIndex(tableName, options);
-    const missingIndexes = this.getIndexes()
-      .filter(item1 => !existingIndexes.some(item2 => item1.name === item2.name))
-      .sort((index1, index2) => {
-        if (this.sequelize.options.dialect === 'postgres') {
-          // move concurrent indexes to the bottom to avoid weird deadlocks
-          if (index1.concurrently === true) {
-            return 1;
+    if (this.sequelize.dialect.name !== 'momento') {
+      const existingIndexes = await this.queryInterface.showIndex(tableName, options);
+      const missingIndexes = this.getIndexes()
+        .filter(item1 => !existingIndexes.some(item2 => item1.name === item2.name))
+        .sort((index1, index2) => {
+          if (this.sequelize.options.dialect === 'postgres') {
+            // move concurrent indexes to the bottom to avoid weird deadlocks
+            if (index1.concurrently === true) {
+              return 1;
+            }
+
+            if (index2.concurrently === true) {
+              return -1;
+            }
           }
 
-          if (index2.concurrently === true) {
-            return -1;
-          }
-        }
+          return 0;
+        });
 
-        return 0;
-      });
-
-    for (const index of missingIndexes) {
-      // TODO: 'options' is ignored by addIndex, making Add Index queries impossible to log.
-      await this.queryInterface.addIndex(tableName, index, options);
+      for (const index of missingIndexes) {
+        // TODO: 'options' is ignored by addIndex, making Add Index queries impossible to log.
+        await this.queryInterface.addIndex(tableName, index, options);
+      }
     }
 
     if (options.hooks) {
@@ -3753,6 +3754,11 @@ Instead of specifying a Model, either:
     if (this.isNewRecord) {
       query = 'insert';
       args = [this, this.constructor.getTableName(options), values, options];
+    }
+
+    if (this.sequelize.options.dialect === 'momento') {
+      await this.constructor.queryInterface[query](...args);
+      return this;
     }
 
     const [result, rowsUpdated] = await this.constructor.queryInterface[query](...args);

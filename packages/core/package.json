@@ -67,6 +67,7 @@
     "wkx": "^0.5.0"
   },
   "devDependencies": {
+    "@gomomento/sdk": "^1.35.0",
     "@types/chai": "4.3.6",
     "@types/chai-as-promised": "7.1.6",
     "@types/chai-datetime": "0.0.37",
@@ -107,6 +108,9 @@
     "tedious": "16.4.0"
   },
   "peerDependenciesMeta": {
+    "@gomomento/sdk": {
+      "optional": true
+    },
     "ibm_db": {
       "optional": true
     },
@@ -186,11 +190,12 @@
     "test-integration-mysql": "cross-env DIALECT=mysql yarn test-integration",
     "test-integration-postgres": "cross-env DIALECT=postgres yarn test-integration",
     "test-integration-postgres-native": "cross-env DIALECT=postgres-native yarn test-integration",
-    "test-integration-sqlite": "cross-env DIALECT=sqlite yarn test-integration",
+    "test-integration-sqlite": "cross-env DIALECT=sqlite yarn mocha",
     "test-integration-mssql": "cross-env DIALECT=mssql yarn test-integration",
     "test-integration-db2": "cross-env DIALECT=db2 yarn test-integration",
     "test-integration-ibmi": "cross-env DIALECT=ibmi yarn test-integration",
     "test-integration-snowflake": "cross-env DIALECT=snowflake yarn test-integration",
+    "test-integration-momento": "DIALECT=momento yarn mocha",
     "test-integration-all": "yarn test-integration-mariadb && yarn test-integration-mysql && yarn test-integration-postgres && yarn test-integration-postgres-native && yarn test-integration-sqlite && yarn test-integration-mssql && yarn test-integration-db2 && yarn test-integration-ibmi && yarn test-integration-snowflake",
     "----------------------------------------- all tests ---------------------------------------------": "",
     "test-mariadb": "cross-env DIALECT=mariadb yarn test",
@@ -201,6 +206,7 @@
     "test-mssql": "cross-env DIALECT=mssql yarn test",
     "test-db2": "cross-env DIALECT=db2 yarn test",
     "test-ibmi": "cross-env DIALECT=ibmi yarn test",
+    "test-momento": "cross-env DIALECT=momento yarn test",
     "----------------------------------------- development ---------------------------------------------": "",
     "build": "node ../../build-packages.mjs core"
   },

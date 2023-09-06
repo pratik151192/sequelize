@@ -97,4 +97,6 @@ export const Config: Record<Dialect, Options> = {
       odbcConnectionString: env.SEQ_IBMI_CONN_STR,
     },
   },
+
+  momento: {},
 };
