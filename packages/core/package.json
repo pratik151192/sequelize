@@ -67,6 +67,7 @@
     "wkx": "^0.5.0"
   },
   "devDependencies": {
+    "@gomomento/sdk": "^1.35.0",
     "@types/chai": "4.3.6",
     "@types/chai-as-promised": "7.1.6",
     "@types/chai-datetime": "0.0.37",
@@ -107,6 +108,9 @@
     "tedious": "16.4.0"
   },
   "peerDependenciesMeta": {
+    "@gomomento/sdk": {
+      "optional": true
+    },
     "ibm_db": {
       "optional": true
     },
