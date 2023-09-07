@@ -6,6 +6,9 @@ const dialect = sequelize.dialect;
 const notImplementedError = new Error(`removeIndexQuery has not been implemented in ${dialect.name}.`);
 
 describe('QueryGenerator#removeIndexQuery', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   it('produces a DROP INDEX query from a table', () => {

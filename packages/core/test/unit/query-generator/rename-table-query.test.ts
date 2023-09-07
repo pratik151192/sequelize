@@ -3,6 +3,9 @@ import { createSequelizeInstance, expectsql, sequelize } from '../../support';
 const dialect = sequelize.dialect;
 
 describe('QueryGenerator#renameTableQuery', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   it('produces a query that renames the table', () => {

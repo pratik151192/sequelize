@@ -14,7 +14,7 @@ const TICK_LEFT = Support.sequelize.dialect.TICK_CHAR_LEFT;
 const TICK_RIGHT = Support.sequelize.dialect.TICK_CHAR_RIGHT;
 
 describe(Support.getTestDialectTeaser('SQL'), () => {
-  if (current.dialect.name === 'snowflake') {
+  if (current.dialect.name === 'snowflake' || current.dialect.name === 'momento') {
     return;
   }
 

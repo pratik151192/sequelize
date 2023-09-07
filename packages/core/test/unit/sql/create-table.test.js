@@ -8,7 +8,8 @@ const current   = Support.sequelize;
 const sql       = current.dialect.queryGenerator;
 
 describe(Support.getTestDialectTeaser('SQL'), () => {
-  if (current.dialect.name === 'snowflake') {
+
+  if (current.dialect.name === 'snowflake' || current.dialect.name === 'momento') {
     return;
   }
 

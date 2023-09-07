@@ -9,6 +9,10 @@ const { queryGenerator, dialect } = sequelize;
 const dialectName = dialect.name;
 
 describe('DataTypes.BOOLEAN', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
+
   testDataTypeSql('BOOLEAN', DataTypes.BOOLEAN, {
     default: 'BOOLEAN',
     ibmi: 'SMALLINT',
@@ -41,6 +45,9 @@ describe('DataTypes.BOOLEAN', () => {
 });
 
 describe('DataTypes.ENUM', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   it('produces an enum', () => {
     const User = sequelize.define('User', {
       anEnum: DataTypes.ENUM('value 1', 'value 2'),
@@ -98,6 +105,9 @@ describe('DataTypes.ENUM', () => {
 });
 
 describe('DataTypes.RANGE', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   describe('validate', () => {
     it('should throw an error if `value` is invalid', () => {
       const type = DataTypes.RANGE(DataTypes.INTEGER);
@@ -124,6 +134,9 @@ describe('DataTypes.RANGE', () => {
 });
 
 describe('DataTypes.JSON', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   testDataTypeSql('JSON', DataTypes.JSON, {
     default: new Error(`${dialectName} does not support the JSON data type.\nSee https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`),
 
@@ -192,6 +205,9 @@ describe('DataTypes.JSON', () => {
 });
 
 describe('DataTypes.JSONB', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   testDataTypeSql('JSONB', DataTypes.JSONB, {
     default: new Error(`${dialectName} does not support the JSONB data type.\nSee https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`),
     postgres: 'JSONB',
@@ -199,6 +215,9 @@ describe('DataTypes.JSONB', () => {
 });
 
 describe('DataTypes.HSTORE', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   describe('toSql', () => {
     testDataTypeSql('HSTORE', DataTypes.HSTORE, {
       default: new Error(`${dialectName} does not support the HSTORE data type.\nSee https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`),

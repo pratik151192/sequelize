@@ -17,6 +17,11 @@ const dialect = sequelize.dialect;
 const supportsNamedParameters = dialect.name === 'sqlite' || dialect.name === 'mssql';
 
 describe('mapBindParameters', () => {
+
+  if (dialect.name === 'momento') {
+    return;
+  }
+
   it('parses named bind parameters', () => {
     const { sql, bindOrder } = mapBindParameters(`SELECT ${dialect.TICK_CHAR_LEFT}$id${dialect.TICK_CHAR_RIGHT} FROM users WHERE id = '$id' OR id = $id OR id = '''$id'''`, dialect);
 

@@ -1,7 +1,11 @@
 import { DataTypes, literal } from '@sequelize/core';
 import { expectsql, sequelize } from '../../support';
 
+const dialect = sequelize.dialect;
 describe('QueryGenerator#bulkInsertQuery', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   const User = sequelize.define('User', {

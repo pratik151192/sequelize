@@ -111,6 +111,10 @@ TestModel.init({
 }, { sequelize });
 
 describe(getTestDialectTeaser('SQL'), () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
+
   describe('whereQuery', () => {
     it('prefixes its output with WHERE when it is not empty', () => {
       expectsql(

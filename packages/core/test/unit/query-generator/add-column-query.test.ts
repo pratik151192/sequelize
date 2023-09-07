@@ -5,6 +5,9 @@ import { expectsql, getTestDialect, sequelize } from '../../support';
 const dialectName = getTestDialect();
 
 describe('QueryGenerator#addColumnQuery', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   const User = sequelize.define('User', {

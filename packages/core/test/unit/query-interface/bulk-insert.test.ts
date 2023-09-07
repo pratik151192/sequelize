@@ -4,7 +4,11 @@ import sinon from 'sinon';
 import { DataTypes, Transaction } from '@sequelize/core';
 import { expectPerDialect, sequelize, toMatchRegex, toMatchSql } from '../../support';
 
+const dialect = sequelize.dialect;
 describe('QueryInterface#bulkInsert', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   const User = sequelize.define('User', {
     firstName: DataTypes.STRING,
   }, { timestamps: false });

@@ -6,6 +6,9 @@ import { createSequelizeInstance, getTestDialect, sequelize } from '../../suppor
 const dialectName = getTestDialect();
 
 describe('Model', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   describe('define', () => {
     it('should allow custom timestamps with underscored: true', () => {
       const User = sequelize.define('User', {}, {

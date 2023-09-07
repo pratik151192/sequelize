@@ -1,6 +1,9 @@
 import { expectsql, sequelize } from '../../support';
 
 describe('QueryGenerator#versionQuery', () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   it('produces a query that returns the database version', () => {

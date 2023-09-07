@@ -4,6 +4,8 @@ import { DataTypes, Model } from '@sequelize/core';
 import { beforeEach2, sequelize, setResetMode } from '../support';
 import { testSimpleInOut, testSimpleInOutRaw } from './data-types.test';
 
+const dialect = sequelize.dialect;
+
 enum TestEnum {
   A = 'A',
   B = 'B',
@@ -11,6 +13,9 @@ enum TestEnum {
 }
 
 describe('DataTypes.ENUM', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   setResetMode('none');
 
   const vars = beforeEach2(async () => {

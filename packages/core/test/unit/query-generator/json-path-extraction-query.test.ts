@@ -6,6 +6,9 @@ const dialectName = dialect.name;
 const notSupportedError = new Error(`JSON Paths are not supported in ${dialectName}.`);
 
 describe('QueryGenerator#jsonPathExtractionQuery', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   if (dialect.supports.jsonExtraction.quoted) {

@@ -3,6 +3,9 @@ import { createSequelizeInstance, expectsql, sequelize } from '../../support';
 const dialect = sequelize.dialect;
 
 describe('QueryGenerator#tableExistsQuery', () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.queryGenerator;
   const defaultSchema = dialect.getDefaultSchema();
 

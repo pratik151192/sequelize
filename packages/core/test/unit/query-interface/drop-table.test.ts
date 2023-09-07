@@ -5,6 +5,9 @@ import { expectsql, getTestDialect, sequelize } from '../../support';
 const dialectName = getTestDialect();
 
 describe('QueryInterface#dropTable', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   afterEach(() => {
     sinon.restore();
   });

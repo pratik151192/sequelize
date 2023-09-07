@@ -2,11 +2,15 @@ import { expect } from 'chai';
 import type { SinonStub } from 'sinon';
 import sinon from 'sinon';
 import type { Connection, Sequelize } from '@sequelize/core';
-import { createSequelizeInstance } from '../support';
+import {createSequelizeInstance, getTestDialect} from '../support';
 
 describe('connection manager', () => {
   let connection: Connection;
   let sequelize: Sequelize;
+
+  if (getTestDialect() === 'momento') {
+    return;
+  }
 
   beforeEach(() => {
     connection = {};

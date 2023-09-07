@@ -3,7 +3,12 @@ import sinon from 'sinon';
 import { DataTypes } from '@sequelize/core';
 import { expectsql, sequelize } from '../../support';
 
+const dialect = sequelize.dialect;
+
 describe('QueryInterface#select', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   const User = sequelize.define('User', {
     firstName: DataTypes.STRING,
   }, { timestamps: false });

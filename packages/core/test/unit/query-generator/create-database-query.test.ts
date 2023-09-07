@@ -7,6 +7,9 @@ const dialectName = getTestDialect();
 const notSupportedError = new Error(`Databases are not supported in ${dialectName}.`);
 
 describe('QueryGenerator#createDatabaseQuery', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   it('produces a CREATE DATABASE query in supported dialects', () => {

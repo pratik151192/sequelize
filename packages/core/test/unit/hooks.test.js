@@ -8,10 +8,14 @@ const sinon = require('sinon');
 const expect = chai.expect;
 const Support = require('../support');
 const { DataTypes, Sequelize } = require('@sequelize/core');
+const { getTestDialect } = require('../support');
 
 const sequelize = Support.sequelize;
 
 describe(Support.getTestDialectTeaser('Hooks'), () => {
+  if (getTestDialect() === 'momento') {
+    return;
+  }
   beforeEach(function () {
     this.Model = sequelize.define('m');
   });

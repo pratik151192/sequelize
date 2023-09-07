@@ -5,8 +5,12 @@ const chai = require('chai');
 const expect = chai.expect;
 const Support = require('../support');
 const { DataTypes } = require('@sequelize/core');
+const { getTestDialect } = require('../../support');
 
 describe(Support.getTestDialectTeaser('Self'), () => {
+  if (getTestDialect() === 'momento') {
+    return;
+  }
   it('supports freezeTableName', async function () {
     const Group = this.sequelize.define('Group', {}, {
       tableName: 'user_group',

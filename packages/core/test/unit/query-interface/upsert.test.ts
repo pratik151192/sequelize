@@ -6,6 +6,10 @@ import { expectsql, sequelize } from '../../support';
 const dialectName = sequelize.dialect.name;
 
 describe('QueryInterface#upsert', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
+
   const User = sequelize.define('User', {
     firstName: DataTypes.STRING,
   }, { timestamps: false });

@@ -346,6 +346,9 @@ export class Sequelize extends SequelizeTypeScript {
       case 'snowflake':
         Dialect = require('./dialects/snowflake').SnowflakeDialect;
         break;
+      case 'momento':
+        Dialect = require('./dialects/momento').MomentoDialect;
+        break;
       default:
         throw new Error(`The dialect ${this.getDialect()} is not supported. Supported dialects: mariadb, mssql, mysql, postgres, sqlite, ibmi, db2 and snowflake.`);
     }

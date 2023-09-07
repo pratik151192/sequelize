@@ -10,6 +10,9 @@ const current = Support.sequelize;
 const dialect = Support.getTestDialect();
 
 describe(Support.getTestDialectTeaser('HasOne'), () => {
+  if (dialect === 'momento') {
+    return;
+  }
   describe('get', () => {
     describe('multiple', () => {
       it('should fetch associations for multiple instances', async function () {

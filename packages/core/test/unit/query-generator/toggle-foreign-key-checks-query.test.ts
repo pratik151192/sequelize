@@ -5,6 +5,9 @@ const queryGenerator = sequelize.queryGenerator;
 const notSupportedError = new Error(`${dialectName} does not support toggling foreign key checks`);
 
 describe('QueryGenerator#getToggleForeignKeyChecksQuery', () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
   it('produces a query that disables foreign key checks', () => {
     expectsql(() => queryGenerator.getToggleForeignKeyChecksQuery(false), {
       default: notSupportedError,

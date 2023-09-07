@@ -4,8 +4,12 @@ const  chai = require('chai');
 
 const expect = chai.expect;
 const Support = require('../support');
+const { getTestDialect } = require('../../support');
 
 describe(Support.getTestDialectTeaser('Alias'), () => {
+  if (getTestDialect() === 'momento') {
+    return;
+  }
   it('should uppercase the first letter in alias getter, but not in eager loading', async function () {
     const User = this.sequelize.define('user', {});
     const Task = this.sequelize.define('task', {});

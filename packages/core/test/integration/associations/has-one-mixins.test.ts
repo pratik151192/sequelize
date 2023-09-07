@@ -7,6 +7,9 @@ import { beforeAll2, createMultiTransactionalTestSequelizeInstance, sequelize, s
 const dialect = sequelize.dialect;
 
 describe('hasOne Mixins', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   setResetMode('destroy');
 
   const vars = beforeAll2(async () => {

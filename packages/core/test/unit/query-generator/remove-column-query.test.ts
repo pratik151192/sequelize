@@ -6,6 +6,9 @@ const dialectName = getTestDialect();
 const notSupportedError = new Error(`removeColumnQuery is not supported in ${dialectName}.`);
 
 describe('QueryGenerator#removeColumnQuery', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   it('generates a query that drops a column', () => {

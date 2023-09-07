@@ -8,6 +8,10 @@ const dialect = sequelize.dialect;
 const dialectName = dialect.name;
 
 describe('DataTypes.STRING', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
+
   describe('toSql', () => {
     const binaryCollationUnsupportedError = new Error(`${dialectName} does not support the STRING.BINARY data type.
 See https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`);

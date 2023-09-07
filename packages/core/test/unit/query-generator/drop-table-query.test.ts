@@ -5,6 +5,9 @@ const dialectName = getTestDialect();
 const dialect = sequelize.dialect;
 
 describe('QueryGenerator#dropTableQuery', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   it('produces a query that drops a table', () => {

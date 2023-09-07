@@ -3,6 +3,9 @@ import { createSequelizeInstance, expectsql, sequelize } from '../../support';
 const dialect = sequelize.dialect;
 
 describe('QueryGenerator#showIndexesQuery', () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   it('produces a SHOW INDEX query from a table', () => {

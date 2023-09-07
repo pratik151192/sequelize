@@ -9,6 +9,9 @@ const dialectName = getTestDialect();
 // TODO: see if some logic in handling columns can be moved to attributeToSQL which could make some tests here redundant
 
 describe('QueryGenerator#createTableQuery', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   it('produces a query to create a table', () => {

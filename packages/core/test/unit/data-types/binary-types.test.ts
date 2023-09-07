@@ -1,8 +1,16 @@
 import { expect } from 'chai';
 import { DataTypes, ValidationErrorItem } from '@sequelize/core';
+import { sequelize } from '../../support';
 import { testDataTypeSql } from './_utils';
 
+const dialect = sequelize.dialect;
+const dialectName = dialect.name;
+
 describe('DataTypes.BLOB', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
+
   testDataTypeSql('BLOB', DataTypes.BLOB, {
     default: 'BLOB',
     'ibmi db2': 'BLOB(1M)',

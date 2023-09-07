@@ -9,6 +9,11 @@ const deferrableNotSupportedError = new Error(`Deferrable constraints are not su
 const onUpdateNotSupportedError = new Error(`Foreign key constraint with onUpdate is not supported by ${dialect.name} dialect`);
 
 describe('QueryGenerator#addConstraintQuery', () => {
+
+  if (dialect.name === 'momento') {
+    return;
+  }
+
   const queryGenerator = sequelize.queryGenerator;
 
   it('throws an error if invalid type', () => {

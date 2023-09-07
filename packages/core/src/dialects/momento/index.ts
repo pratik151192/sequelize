@@ -48,6 +48,7 @@ export class MomentoDialect extends AbstractDialect {
       unquoted: false,
       quoted: false,
     },
+    transactions: false,
   });
 
   readonly Query = MomentoQuery;
@@ -56,8 +57,8 @@ export class MomentoDialect extends AbstractDialect {
   readonly queryGenerator: AbstractQueryGenerator;
   readonly queryInterface: AbstractQueryInterface;
 
-  readonly TICK_CHAR_LEFT = '';
-  readonly TICK_CHAR_RIGHT = '';
+  readonly TICK_CHAR_LEFT = '"';
+  readonly TICK_CHAR_RIGHT = '"';
   readonly defaultVersion = '';
   constructor(sequelize: Sequelize) {
     super(sequelize, DataTypes, 'momento');

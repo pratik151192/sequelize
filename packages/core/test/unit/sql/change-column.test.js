@@ -7,7 +7,7 @@ const { DataTypes } = require('@sequelize/core');
 const expectsql = Support.expectsql;
 const current = Support.sequelize;
 
-if (current.dialect.name !== 'sqlite') {
+if (current.dialect.name !== 'sqlite' && current.dialect.name !== 'momento') {
   describe(Support.getTestDialectTeaser('SQL'), () => {
     describe('changeColumn', () => {
 

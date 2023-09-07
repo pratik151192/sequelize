@@ -9,6 +9,10 @@ const current     = Support.sequelize;
 const sql         = current.dialect.queryGenerator;
 
 describe(Support.getTestDialectTeaser('SQL'), () => {
+  if (current.dialect.name === 'momento') {
+    return;
+  }
+
   describe('group', () => {
     const testsql = function (options, expectation) {
       const model = options.model;

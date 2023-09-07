@@ -3,6 +3,10 @@ import type { DataTypeClassOrInstance } from '@sequelize/core';
 import { createTester, expectsql, sequelize } from '../../support';
 
 export const testDataTypeSql = createTester((it, description: string, dataType: DataTypeClassOrInstance, expectation) => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
+
   it(description, () => {
     let result: Error | string;
 

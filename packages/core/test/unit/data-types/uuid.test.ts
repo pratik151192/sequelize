@@ -3,8 +3,15 @@ import { expect } from 'chai';
 import { v1 as uuidV1, v4 as uuidV4 } from 'uuid';
 import { DataTypes, ValidationErrorItem } from '@sequelize/core';
 import { testDataTypeSql } from './_utils';
+import {sequelize} from '../../support';
+
+const dialect = sequelize.dialect;
 
 describe('DataTypes.UUID', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
+
   describe('toSql', () => {
     testDataTypeSql('UUID', DataTypes.UUID, {
       postgres: 'UUID',

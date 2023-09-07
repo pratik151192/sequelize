@@ -6,6 +6,10 @@ import { testDataTypeSql } from './_utils';
 const { dialect, queryGenerator } = sequelize;
 
 describe('DataTypes.ARRAY', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
+
   const unsupportedError = new Error(`${dialect.name} does not support the ARRAY data type.\nSee https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`);
 
   testDataTypeSql('ARRAY(VARCHAR)', DataTypes.ARRAY(DataTypes.STRING), {

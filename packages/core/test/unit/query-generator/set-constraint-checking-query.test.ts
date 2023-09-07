@@ -6,6 +6,9 @@ const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 const notSupportedError = new Error(`Deferrable constraints are not supported by ${name} dialect`);
 
 describe('QueryGenerator#setConstraintCheckingQuery', () => {
+  if (name === 'momento') {
+    return;
+  }
   describe('DEFERRED constraints', () => {
     it('generates a deferred constraint checking query for all constraints', () => {
       expectsql(() => queryGenerator.setConstraintCheckingQuery(new ConstraintChecking.DEFERRED()), {

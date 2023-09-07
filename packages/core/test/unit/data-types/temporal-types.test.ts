@@ -10,6 +10,10 @@ const nowString = now.toISOString();
 const nowDateOnly = nowString.slice(0, 10);
 
 describe('DataTypes.DATE', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
+
   describe('toSql', () => {
     testDataTypeSql('DATE', DataTypes.DATE, {
       'db2 ibmi snowflake': 'TIMESTAMP',

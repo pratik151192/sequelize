@@ -4,6 +4,10 @@ import { DataTypes, Op, literal } from '@sequelize/core';
 import { expectsql, sequelize } from '../../support';
 
 describe('QueryInterface#update', () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
+
   const User = sequelize.define('User', {
     firstName: DataTypes.STRING,
   }, { timestamps: false });

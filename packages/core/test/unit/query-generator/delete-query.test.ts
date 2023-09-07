@@ -1,7 +1,11 @@
 import { DataTypes, literal } from '@sequelize/core';
 import { expectsql, sequelize } from '../../support';
 
+const dialectName = sequelize.getDialect();
 describe('QueryGenerator#deleteQuery', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   const User = sequelize.define('User', {

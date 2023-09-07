@@ -3,6 +3,8 @@ import sinon from 'sinon';
 import { DataTypes } from '@sequelize/core';
 import { expectsql, sequelize } from '../../support';
 
+const dialect = sequelize.dialect;
+
 describe('QueryInterface#increment', () => {
   const User = sequelize.define('User', {
     firstName: DataTypes.STRING,

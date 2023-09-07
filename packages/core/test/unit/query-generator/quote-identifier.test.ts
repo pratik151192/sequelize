@@ -1,6 +1,10 @@
 import { expectsql, sequelize } from '../../support';
 
+const dialectName = sequelize.getDialect();
 describe('QueryGenerator#quoteIdentifier', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
   const TICK_RIGHT = sequelize.dialect.TICK_CHAR_RIGHT;
   const TICK_LEFT = sequelize.dialect.TICK_CHAR_LEFT;

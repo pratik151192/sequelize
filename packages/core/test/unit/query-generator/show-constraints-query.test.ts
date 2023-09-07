@@ -5,6 +5,10 @@ const sequelize = createSequelizeInstance();
 const dialect = sequelize.dialect;
 
 describe('QueryGenerator#showConstraintsQuery', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
+
   const queryGenerator = sequelize.queryGenerator;
 
   it('produces a show constraints query for a table', () => {

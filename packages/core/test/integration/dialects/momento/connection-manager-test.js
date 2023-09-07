@@ -7,7 +7,8 @@ describe('[Momento] Sequelize', () => {
     return;
   }
 
-  it('should not set client_min_messages if clientMinMessages is false (deprecated in v7)', async () => {
-    Support.createSingleTestSequelizeInstance();
+  it('should successfully create a client', async () => {
+    const instance = Support.createSingleTestSequelizeInstance();
+    await instance.connectionManager.connect({});
   });
 });

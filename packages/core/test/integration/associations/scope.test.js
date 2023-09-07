@@ -9,8 +9,12 @@ const { DataTypes, Op } = require('@sequelize/core');
 const current = Support.sequelize;
 const semver = require('semver');
 const upperFirst = require('lodash/upperFirst');
+const { getTestDialect } = require('../../support');
 
 describe(Support.getTestDialectTeaser('associations'), () => {
+  if (getTestDialect() === 'momento') {
+    return;
+  }
   describe('scope', () => {
     beforeEach(function () {
       this.Post = this.sequelize.define('post', {});

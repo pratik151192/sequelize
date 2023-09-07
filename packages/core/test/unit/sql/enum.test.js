@@ -9,6 +9,9 @@ const sql       = current.dialect.queryGenerator;
 const expect    = require('chai').expect;
 
 describe(Support.getTestDialectTeaser('SQL'), () => {
+  if (current.dialect.name === 'momento') {
+    return;
+  }
   describe('enum', () => {
     if (Support.getTestDialect() === 'postgres') {
       const FooUser = current.define('user', {

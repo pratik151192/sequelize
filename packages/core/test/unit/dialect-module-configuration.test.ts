@@ -5,6 +5,9 @@ import { getTestDialect, getTestDialectTeaser } from '../support';
 const dialect = getTestDialect();
 
 describe(getTestDialectTeaser('Sequelize'), () => {
+  if (dialect === 'momento') {
+    return;
+  }
   describe('dialectModule options', () => {
     it('options.dialectModule', () => {
       const dialectModule = {

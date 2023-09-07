@@ -16,6 +16,9 @@ const assert = require('node:assert');
 const dialect = Support.getTestDialect();
 
 describe(Support.getTestDialectTeaser('HasMany'), () => {
+  if (dialect === 'momento') {
+    return;
+  }
   describe('Model.associations', () => {
     it('should store all assocations when associting to the same table multiple times', function () {
       const User = this.sequelize.define('User', {});

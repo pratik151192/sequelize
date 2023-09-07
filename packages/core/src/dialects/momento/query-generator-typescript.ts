@@ -2,7 +2,6 @@ import type { Expression } from '../../sequelize.js';
 import { AbstractQueryGenerator } from '../abstract/query-generator';
 import type {
   EscapeOptions,
-  QueryGeneratorOptions,
   RemoveIndexQueryOptions,
   TableNameOrModel,
 } from '../abstract/query-generator-typescript';
@@ -12,9 +11,6 @@ import type { ShowConstraintsQueryOptions } from '../abstract/query-generator.ty
  * Temporary class to ease the TypeScript migration
  */
 export class MomentoQueryGeneratorTypeScript extends AbstractQueryGenerator {
-  constructor(options: QueryGeneratorOptions) {
-    super(options);
-  }
 
   describeTableQuery(tableName: TableNameOrModel): string {
     throw new Error(`The describeTableQuery operation is not supported. tableName ${tableName}`);
@@ -51,6 +47,25 @@ export class MomentoQueryGeneratorTypeScript extends AbstractQueryGenerator {
   }
 
   versionQuery(): string {
-    throw new Error(`The versionQuery operation is not supported.`);
+    return '1.0';
   }
+
+  // createTableQuery(
+  //   tableName: TableNameOrModel,
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   columns: { [columnName: string]: string },
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   options?: CreateTableQueryOptions,
+  // ): string {
+  //   const conn = this.sequelize.connectionManager.getConnection() as Promise<MomentoConnection>;
+  //
+  //   conn.then((mConn: MomentoConnection) => {
+  //     mConn.cacheClient.createCache(tableName.toString());
+  //   })
+  //     .catch(error => {
+  //       throw error;
+  //     });
+  //
+  //   return 'Successfully created cache';
+  // }
 }

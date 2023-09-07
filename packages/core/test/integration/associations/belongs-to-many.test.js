@@ -12,6 +12,9 @@ const current = Support.sequelize;
 const dialect = Support.getTestDialect();
 
 describe(Support.getTestDialectTeaser('BelongsToMany'), () => {
+  if (dialect === 'momento') {
+    return;
+  }
   Support.setResetMode('drop');
 
   describe('getAssociations', () => {

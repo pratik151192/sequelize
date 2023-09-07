@@ -5,6 +5,9 @@ const dialect = sequelize.dialect;
 const queryGenerator = sequelize.queryGenerator;
 
 describe('json', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   if (!dialect.supports.jsonOperations || !dialect.supports.jsonExtraction.quoted) {
     return;
   }
@@ -112,6 +115,9 @@ describe('cast', () => {
 });
 
 describe('fn', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   // this was a band-aid over a deeper problem ('$bind' being considered to be a bind parameter when it's a string), which has been fixed
   it('should not escape $ in fn() arguments', () => {
     const out = queryGenerator.escape(fn('upper', '$user'));

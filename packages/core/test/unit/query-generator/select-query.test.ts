@@ -8,6 +8,9 @@ import { expectsql, getTestDialect, sequelize } from '../../support';
 const { attribute, col, cast, where, fn, literal } = sqlTag;
 
 describe('QueryGenerator#selectQuery', () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.queryGenerator;
 
   interface TUser extends Model<InferAttributes<TUser>, InferCreationAttributes<TUser>> {

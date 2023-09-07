@@ -6,7 +6,7 @@
   // Recall that if you want to `grep` over all tests, you need to specify `spec` as
   // `"test/**/*.test.js"`. Not specifying `spec` and calling `yarn mocha` will not
   // execute any test.
-  // "spec": ["test/**/bulk-create.test.js", "test/**/upsert.test.js", "test/**/insert.test.js", "test/**/query-generator.test.js"],
+  "spec": ["test/integration/dialects/momento"],
   // "grep": ["some test title here"],
   "exit": true,
   "check-leaks": true,

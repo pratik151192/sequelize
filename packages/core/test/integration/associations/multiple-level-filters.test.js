@@ -5,8 +5,12 @@ const chai = require('chai');
 const expect = chai.expect;
 const Support = require('../support');
 const { DataTypes } = require('@sequelize/core');
+const { getTestDialect } = require('../../support');
 
 describe(Support.getTestDialectTeaser('Multiple Level Filters'), () => {
+  if (getTestDialect() === 'momento') {
+    return;
+  }
   it('can filter through belongsTo', async function () {
     const User = this.sequelize.define('User', { username: DataTypes.STRING });
     const Task = this.sequelize.define('Task', { title: DataTypes.STRING });

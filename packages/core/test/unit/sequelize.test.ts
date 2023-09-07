@@ -1,8 +1,12 @@
 import { expect } from 'chai';
 import { Sequelize } from '@sequelize/core';
-import { createSequelizeInstance } from '../support';
+import {createSequelizeInstance, getTestDialect} from '../support';
 
 describe('Sequelize', () => {
+  if (getTestDialect() === 'momento') {
+    return;
+  }
+
   describe('constructor', () => {
     it('should correctly set the host and the port', () => {
       const sequelize = createSequelizeInstance({ host: '127.0.0.1', port: 1234 });

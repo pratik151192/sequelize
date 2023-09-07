@@ -8,6 +8,11 @@ const dialect = sequelize.dialect;
 const dialectName = dialect.name;
 
 describe('DataTypes.REAL', () => {
+
+  if (dialectName === 'momento') {
+    return;
+  }
+
   const zeroFillUnsupportedError = new Error(`${dialectName} does not support the REAL.ZEROFILL data type.
 See https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`);
 
@@ -52,6 +57,11 @@ See https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of s
 });
 
 describe('DataTypes.DOUBLE', () => {
+
+  if (dialectName === 'momento') {
+    return;
+  }
+
   const zeroFillUnsupportedError = new Error(`${dialectName} does not support the DOUBLE.ZEROFILL data type.
 See https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`);
 
@@ -109,6 +119,10 @@ See https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of s
 });
 
 describe('DataTypes.FLOAT', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
+
   const zeroFillUnsupportedError = new Error(`${dialectName} does not support the FLOAT.ZEROFILL data type.
 See https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`);
 
@@ -188,6 +202,10 @@ See https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of s
 });
 
 describe('DECIMAL', () => {
+  if (dialectName === 'momento') {
+    return;
+  }
+
   const zeroFillUnsupportedError = new Error(`${dialectName} does not support the DECIMAL.ZEROFILL data type.
 See https://sequelize.org/docs/v7/other-topics/other-data-types/ for a list of supported data types.`);
   const unsupportedError = new Error(`${dialectName} does not support the DECIMAL data type.

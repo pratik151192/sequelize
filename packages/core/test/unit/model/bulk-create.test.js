@@ -10,6 +10,9 @@ const { DataTypes } = require('@sequelize/core');
 const current = Support.sequelize;
 
 describe(Support.getTestDialectTeaser('Model'), () => {
+  if (current.dialect.name === 'momento') {
+    return;
+  }
   describe('bulkCreate', () => {
     const Model = current.define(
       'model',

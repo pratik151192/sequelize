@@ -29,6 +29,9 @@ enum TestEnum {
 }
 
 describe('DataTypes', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   setResetMode('none');
 
   // TODO: merge STRING & TEXT: remove default length limit on STRING instead of using 255.

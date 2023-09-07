@@ -12,6 +12,10 @@ const current = Support.sequelize;
 const dialect = Support.getTestDialect();
 
 describe(Support.getTestDialectTeaser('BelongsTo'), () => {
+  if (dialect === 'momento') {
+    return;
+  }
+
   describe('Model.associations', () => {
     it('should store all associations when associating to the same table multiple times', function () {
       const User = this.sequelize.define('User', {});

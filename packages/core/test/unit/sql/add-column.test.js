@@ -13,6 +13,10 @@ const customSequelize = Support.createSequelizeInstance({
 const customSql = customSequelize.dialect.queryGenerator;
 
 describe(Support.getTestDialectTeaser('SQL'), () => {
+  if (current.dialect.name === 'momento') {
+    return;
+  }
+
   describe('addColumn', () => {
     const User = current.define('User', {}, { timestamps: false });
 

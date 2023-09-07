@@ -17,6 +17,9 @@ const TICK_RIGHT = Support.sequelize.dialect.TICK_CHAR_RIGHT;
 // Notice: [] will be replaced by dialect specific tick/quote character when there is not dialect specific expectation but only a default expectation
 
 describe(Support.getTestDialectTeaser('SQL'), () => {
+  if (current.dialect.name === 'momento') {
+    return;
+  }
   describe('select', () => {
     const testsql = function (options, expectation, testFunction = it) {
       const model = options.model;

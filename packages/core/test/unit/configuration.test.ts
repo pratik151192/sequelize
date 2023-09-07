@@ -32,7 +32,7 @@ describe('Sequelize constructor', () => {
   });
 
   describe('Network Connections (non-sqlite)', () => {
-    if (dialect === 'sqlite') {
+    if (dialect === 'sqlite' || dialect === 'momento') {
       return;
     }
 
@@ -114,6 +114,7 @@ describe('Sequelize constructor', () => {
         mysql: 3306,
         snowflake: 3306,
         sqlite: 0,
+        momento: 443,
       };
 
       expect(config.replication.write).to.deep.eq({

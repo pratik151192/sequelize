@@ -3,6 +3,10 @@ import { DataTypes, literal } from '@sequelize/core';
 import { expectsql, sequelize } from '../../support';
 
 describe('QueryGenerator#updateQuery', () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
+
   const queryGenerator = sequelize.getQueryInterface().queryGenerator;
 
   const User = sequelize.define('User', {

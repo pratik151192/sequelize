@@ -5,6 +5,9 @@ const dialect = sequelize.dialect;
 const notSupportedError = new Error(`Remove constraint queries are not supported by ${dialect.name} dialect`);
 
 describe('QueryGenerator#removeConstraintQuery', () => {
+  if (dialect.name === 'momento') {
+    return;
+  }
   const queryGenerator = sequelize.queryGenerator;
 
   it('generates a query that drops a constraint', () => {

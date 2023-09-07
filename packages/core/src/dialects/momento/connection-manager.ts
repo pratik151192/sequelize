@@ -1,8 +1,8 @@
-import { CacheClient, Configurations, CredentialProvider } from '@gomomento/sdk';
-import type { ConnectionOptions, Sequelize } from '../../sequelize';
-import type { Connection } from '../abstract/connection-manager';
-import { AbstractConnectionManager } from '../abstract/connection-manager';
-import type { MomentoDialect } from './index';
+import {CacheClient, Configurations, CredentialProvider} from '@gomomento/sdk';
+import type {ConnectionOptions, Sequelize} from '../../sequelize';
+import type {Connection, GetConnectionOptions} from '../abstract/connection-manager';
+import {AbstractConnectionManager} from '../abstract/connection-manager';
+import type {MomentoDialect} from './index';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 type Lib = typeof import('@gomomento/sdk');
@@ -30,4 +30,17 @@ export class MomentoConnectionManager extends AbstractConnectionManager<MomentoC
       }),
     };
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // async getConnection(options: GetConnectionOptions): Promise<MomentoConnection> {
+  //   return {
+  //     cacheClient: await CacheClient.create({
+  //       configuration: Configurations.Laptop.latest(),
+  //       credentialProvider: CredentialProvider.fromEnvironmentVariable({
+  //         environmentVariableName: 'MOMENTO_AUTH_TOKEN',
+  //       }),
+  //       defaultTtlSeconds: 60,
+  //     }),
+  //   };
+  // }
 }

@@ -7,6 +7,10 @@ import type { ModelHooks } from '@sequelize/core/_non-semver-use-at-your-own-ris
 import { beforeAll2, createMultiTransactionalTestSequelizeInstance, sequelize, setResetMode } from './support';
 
 describe('AsyncLocalStorage (ContinuationLocalStorage) Transactions (CLS)', () => {
+  if (sequelize.dialect.name === 'momento') {
+    return;
+  }
+
   if (!sequelize.dialect.supports.transactions) {
     return;
   }
