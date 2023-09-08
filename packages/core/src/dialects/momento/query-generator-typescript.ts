@@ -1,11 +1,15 @@
 import type { Expression } from '../../sequelize.js';
-import { AbstractQueryGenerator } from '../abstract/query-generator';
+import {AbstractQueryGenerator, CreateTableQueryOptions} from '../abstract/query-generator';
 import type {
   EscapeOptions,
   RemoveIndexQueryOptions,
   TableNameOrModel,
 } from '../abstract/query-generator-typescript';
 import type { ShowConstraintsQueryOptions } from '../abstract/query-generator.types.js';
+import {MomentoConnection} from "./connection-manager";
+import {CreateCache} from "@gomomento/sdk";
+import {isModelStatic} from "../../utils/model-utils";
+import {isString} from "../../utils/check";
 
 /**
  * Temporary class to ease the TypeScript migration
@@ -50,22 +54,32 @@ export class MomentoQueryGeneratorTypeScript extends AbstractQueryGenerator {
     return '1.0';
   }
 
-  // createTableQuery(
-  //   tableName: TableNameOrModel,
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   columns: { [columnName: string]: string },
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   options?: CreateTableQueryOptions,
-  // ): string {
-  //   const conn = this.sequelize.connectionManager.getConnection() as Promise<MomentoConnection>;
-  //
-  //   conn.then((mConn: MomentoConnection) => {
-  //     mConn.cacheClient.createCache(tableName.toString());
-  //   })
-  //     .catch(error => {
-  //       throw error;
-  //     });
-  //
-  //   return 'Successfully created cache';
-  // }
+  createTableQuery(
+    tableNameOrModel: TableNameOrModel,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    columns: { [columnName: string]: string },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    options?: CreateTableQueryOptions,
+  ): string {
+    const tableNameObject = isModelStatic(tableNameOrModel) ? tableNameOrModel.getTableName()
+      : isString(tableNameOrModel) ? { tableName: tableNameOrModel }
+        : tableNameOrModel;
+    const conn = this.sequelize.connectionManager.getConnection() as Promise<MomentoConnection>;
+
+    conn.then((mConn: MomentoConnection) => {
+      mConn.cacheClient.createCache(tableNameObject.tableName)
+        .then(response => {
+          if (response instanceof CreateCache.Error) {
+            throw new Error('An exception occured while creating cache', response.innerException());
+          }
+        })
+        .catch(error => {
+          throw new Error('An exception occurred while creating cache:', error);
+        });
+    }).catch(error => {
+      throw error;
+    });
+
+    return 'Successfully created cache';
+  }
 }

@@ -8,14 +8,13 @@ export class MomentoQueryGenerator extends MomentoQueryGeneratorTypeScript {
     console.log("yet to be implemented!")
   }
 
-  // attributesToSQL(attributes, options) {
-  //   const result = {};
-  //
-  //   for (const key in attributes) {
-  //     const attribute = attributes[key];
-  //     result[attribute.field || key] = this.attributeToSQL(attribute, options);
-  //   }
-  //
-  //   return result;
-  // }
+  attributesToSQL(attributes, options) {
+    const result = {};
+
+    for (const name in attributes) {
+      result[name] = attributes[name];
+    }
+
+    return result;
+  }
 }
