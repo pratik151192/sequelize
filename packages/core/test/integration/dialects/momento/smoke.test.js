@@ -26,7 +26,6 @@ if (dialect === 'momento') {
         });
 
         await User.sync({ force: true });
-        await User.create({ id: 1, username: 'jozef', lastActivity: new Date(Date.UTC(2021, 5, 21)) });
 
       });
 
@@ -34,7 +33,16 @@ if (dialect === 'momento') {
         await User.drop();
       });
 
-      it('insert success', async () => {
+      it('insert and select success', async () => {
+        //await User.create({ id: 1, username: 'jozef', lastActivity: new Date(Date.UTC(2021, 5, 21)) });
+        const user = await User.findOne({
+          where:
+            {
+              id: '1',
+            },
+        });
+        console.log('user', user);
+        user.username.should.equal('jozef');
       });
 
     });
