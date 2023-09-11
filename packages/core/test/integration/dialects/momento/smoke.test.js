@@ -33,6 +33,7 @@ if (dialect === 'momento') {
       });
 
       after(async () => {
+        await MomentoUser.drop();
       });
 
       it('insert and select success', async () => {
