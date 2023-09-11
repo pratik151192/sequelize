@@ -4,8 +4,9 @@ import { MomentoQueryGeneratorTypeScript } from './query-generator-typescript';
 export class MomentoQueryGenerator extends MomentoQueryGeneratorTypeScript {
 
   deleteQuery(tableName, where, options = EMPTY_OBJECT, model) {
-    // eslint-disable-next-line no-console
-    console.log("yet to be implemented!")
+    console.log(this.whereQuery());
+
+    return this.whereQuery();
   }
 
   attributesToSQL(attributes, options) {

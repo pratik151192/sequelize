@@ -43,6 +43,7 @@ if (dialect === 'sqlite') {
         const users = await this.User.findAll({
           where: { createdAt: { [Op.gt]: new Date(2012, 1, 1) } },
         });
+        console.log(users);
 
         expect(users).to.have.length(1);
       });

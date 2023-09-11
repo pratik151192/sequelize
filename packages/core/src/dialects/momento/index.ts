@@ -36,13 +36,6 @@ export class MomentoDialect extends AbstractDialect {
       remove: false,
     },
     groupedLimit: false,
-    dataTypes: {
-      CHAR: true,
-      COLLATE_BINARY: false,
-      CITEXT: false,
-      DECIMAL: false,
-      JSON: true,
-    },
     jsonOperations: false,
     jsonExtraction: {
       unquoted: false,

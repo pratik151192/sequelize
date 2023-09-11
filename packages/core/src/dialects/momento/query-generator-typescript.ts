@@ -1,5 +1,5 @@
 import type { Expression } from '../../sequelize.js';
-import {AbstractQueryGenerator, CreateTableQueryOptions} from '../abstract/query-generator';
+import {AbstractQueryGenerator, CreateTableQueryOptions, DropTableQueryOptions} from '../abstract/query-generator';
 import type {
   EscapeOptions,
   RemoveIndexQueryOptions,
@@ -7,9 +7,10 @@ import type {
 } from '../abstract/query-generator-typescript';
 import type { ShowConstraintsQueryOptions } from '../abstract/query-generator.types.js';
 import {MomentoConnection} from "./connection-manager";
-import {CreateCache} from "@gomomento/sdk";
+import {CreateCache, DeleteCache} from "@gomomento/sdk";
 import {isModelStatic} from "../../utils/model-utils";
 import {isString} from "../../utils/check";
+import {EMPTY_OBJECT} from "../../utils/object";
 
 /**
  * Temporary class to ease the TypeScript migration
@@ -81,5 +82,30 @@ export class MomentoQueryGeneratorTypeScript extends AbstractQueryGenerator {
     });
 
     return 'Successfully created cache';
+  }
+
+  dropTableQuery(tableName: TableNameOrModel,
+                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                 options?: DropTableQueryOptions): string {
+    const tableNameObject = isModelStatic(tableName) ? tableName.getTableName()
+      : isString(tableName) ? { tableName }
+        : tableName;
+    const conn = this.sequelize.connectionManager.getConnection() as Promise<MomentoConnection>;
+
+    conn.then((mConn: MomentoConnection) => {
+      mConn.cacheClient.deleteCache(tableNameObject.tableName)
+        .then(response => {
+          if (response instanceof DeleteCache.Error) {
+            throw new Error('An exception occured while creating cache', response.innerException());
+          }
+        })
+        .catch(error => {
+          throw new Error('An exception occurred while creating cache:', error);
+        });
+    }).catch(error => {
+      throw error;
+    });
+
+    return 'Successfully deleted cache';
   }
 }
