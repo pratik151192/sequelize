@@ -22,6 +22,11 @@ export class MomentoDialect extends AbstractDialect {
       conflictFields: false,
       onConflictWhere: false,
     },
+    autoIncrement: {
+      identityInsert: false,
+      defaultValue: false,
+      update: false,
+    },
     index: {
       using: false,
       where: true,
@@ -34,6 +39,7 @@ export class MomentoDialect extends AbstractDialect {
       foreignKeyChecksDisableable: true,
       add: false,
       remove: false,
+      primaryKey: true,
     },
     groupedLimit: false,
     jsonOperations: false,
@@ -76,6 +82,6 @@ export class MomentoDialect extends AbstractDialect {
   }
 
   static getDefaultPort() {
-    return 0;
+    return 6567;
   }
 }

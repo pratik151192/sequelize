@@ -1,18 +1,31 @@
-import {CacheDictionaryFetch, CacheDictionarySetFields, CollectionTtl, CreateCache} from '@gomomento/sdk';
-import type { Model, ModelStatic, NormalizedAttributeOptions } from '../../model';
-import type { Sequelize } from '../../sequelize.js';
+import {
+  CacheDictionaryFetch,
+  CacheDictionarySetFields,
+  CreateCache,
+  DeleteCache,
+  ListCaches,
+  MomentoErrorCode,
+} from '@gomomento/sdk';
+import type { CreationAttributes, Model, ModelStatic, NormalizedAttributeOptions } from '../../model';
+import type { QueryRawOptions, Sequelize } from '../../sequelize.js';
 import { isString } from '../../utils/check';
 import { isModelStatic } from '../../utils/model-utils';
 import { AbstractQueryInterfaceInternal } from '../abstract/query-interface-internal.js';
-import type { QiInsertOptions, QiSelectOptions, TableName } from '../abstract/query-interface.js';
-import {AbstractQueryInterface, QiDeleteOptions, QiOptionsWithReplacements} from '../abstract/query-interface.js';
+import type {
+  CreateTableAttributes,
+  QiInsertOptions,
+  QiOptionsWithReplacements,
+  QiSelectOptions,
+  QueryInterfaceCreateTableOptions,
+  QueryInterfaceDropAllTablesOptions,
+  QueryInterfaceDropTableOptions,
+  TableName,
+} from '../abstract/query-interface.js';
+import { AbstractQueryInterface } from '../abstract/query-interface.js';
 import type { MomentoConnection } from './connection-manager';
 import type { MomentoQueryGenerator } from './query-generator.js';
-import {TableNameOrModel} from "../abstract/query-generator-typescript";
-import {QueryRawOptions} from "../../sequelize.js";
-import {QueryTypes} from "../../query-types";
-import {WhereOptions} from "../abstract/where-sql-builder-types";
-import {EMPTY_OBJECT} from "../../utils/object";
+import { TableNameOrModel } from '../abstract/query-generator-typescript';
+import { WhereOptions } from '../abstract/where-sql-builder-types';
 
 export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
   #internalQueryInterface: AbstractQueryInterfaceInternal;
@@ -35,13 +48,16 @@ export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
       throw new Error('Instance Model object cannot be null');
     }
 
-    const tableNameObject = isModelStatic(tableName) ? tableName.getTableName()
-      : isString(tableName) ? { tableName }
-        : tableName;
+    const tableNameObject = this.getTableNameObject(tableName);
+
     const conn = await this.sequelize.connectionManager.getConnection() as MomentoConnection;
     const primaryKey = (instance.constructor as typeof Model).primaryKeyAttribute;
     if (primaryKey == null) {
-      throw new Error('primary key must not be null and not composed');
+      throw new Error('The Model for a Momento cache must have a primary key defined');
+    }
+
+    if (values[primaryKey] === null || values[primaryKey] === undefined) {
+      throw new Error('Primary key value must be set for a Momento cache Model.');
     }
 
     const dictionaryName = values[primaryKey].toString();
@@ -59,7 +75,7 @@ export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
     }
 
     const response = await conn.cacheClient.dictionarySetFields(tableNameObject.tableName,
-      dictionaryName, dictionaryFields, { ttl: CollectionTtl.of(3000) });
+      dictionaryName, dictionaryFields);
     if (response instanceof CacheDictionarySetFields.Error) {
       throw response.innerException();
     }
@@ -67,31 +83,16 @@ export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
     return {};
   }
 
-  // we override this to make Sequelize instantiation happy.
+
   async tableExists(tableNameOrModel: TableNameOrModel,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options?: QueryRawOptions): Promise<boolean> {
 
-    const tableNameObject = isModelStatic(tableNameOrModel) ? tableNameOrModel.getTableName()
-      : isString(tableNameOrModel) ? { tableName: tableNameOrModel }
-        : tableNameOrModel;
-    const conn = this.sequelize.connectionManager.getConnection() as Promise<MomentoConnection>;
+    const tableNameObject = this.getTableNameObject(tableNameOrModel);
+    const mConn = await this.sequelize.connectionManager.getConnection() as MomentoConnection;
+    const response = await mConn.cacheClient.createCache(tableNameObject.tableName);
 
-    conn.then((mConn: MomentoConnection) => {
-      mConn.cacheClient.createCache(tableNameObject.tableName)
-        .then(response => {
-          if (response instanceof CreateCache.AlreadyExists) {
-            return true;
-          }
-        })
-        .catch(error => {
-          throw new Error('An exception occurred while creating cache:', error);
-        });
-    }).catch(error => {
-      throw error;
-    });
-
-    return false;
+    return response instanceof CreateCache.AlreadyExists;
   }
 
   async select(model: ModelStatic | null, tableName: TableName, options?: QiSelectOptions): Promise<object[]> {
@@ -109,32 +110,34 @@ export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
 
     const primaryKey = model.primaryKeyAttribute;
     if (primaryKey == null) {
-      throw new Error('primary key must not be null and not composed');
+      throw new Error('Primary key must not be null and not composed');
     }
 
     // Extract the keys used in the where clause
     const whereKeys = Object.keys(options?.where as any || {});
-    if (whereKeys.length > 1 || !whereKeys.includes(primaryKey)) {
-      throw new Error('Momento only supports 1 attribute in the where clause which has to be the primary key.');
+    if (whereKeys.length !== 1 || !whereKeys.includes(primaryKey)) {
+      throw new Error(`Momento only supports 1 attribute in the where clause which has to be the primary key.
+      keys ${whereKeys}, primaryKey ${primaryKey}`);
     }
 
     const dictionaryName = (options.where as any)[primaryKey];
 
-    const tableNameObject = isModelStatic(tableName) ? tableName.getTableName()
-      : isString(tableName) ? { tableName }
-        : tableName;
+    const tableNameObject = this.getTableNameObject(tableName);
+
     const attributes = model.modelDefinition.attributes;
 
     const conn = await this.sequelize.connectionManager.getConnection() as MomentoConnection;
 
-    let values: Map<string, string> | null = null;
-    const valuesObject: Record<string, any> = {}; // Initialize valuesObject here
+    let momentoDictionaryValues: Map<string, string> | null = null;
+    // SQL `select` can technically return multiple rows but we just intercept the call here and make sure
+    // we are returning one row as we don't support a scan API yet.
+    const result: Record<string, any> = {};
 
     // Initialize all attributes in the schema to null as SQL supports NULL values. Since we are schemaless,
     // it doesn't make a lot of sense to throw errors here. There's a sequelize option that can tell it to throw
     // on any NULL columns which we can potentially need and extend here if needed.
     for (const key of attributes.keys()) {
-      valuesObject[key] = null;
+      result[key] = null;
     }
 
     const response = await conn.cacheClient.dictionaryFetch(tableNameObject.tableName,
@@ -143,13 +146,13 @@ export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
     if (response instanceof CacheDictionaryFetch.Error) {
       throw response.innerException();
     } else if (response instanceof CacheDictionaryFetch.Hit) {
-      values = response.valueMap();
+      momentoDictionaryValues = response.valueMap();
       // Deserialize each value based on its attribute type
-      for (const [key, value] of values.entries()) {
+      for (const [key, value] of momentoDictionaryValues.entries()) {
         // Make sure the key is a valid attribute of the model
         if (attributes.get(key)) {
           const attribute = attributes.get(key)!;
-          valuesObject[key] = this.deserializeAttribute(key, attribute, value);
+          result[key] = this.deserializeAttribute(key, attribute, value);
         } else {
           // We are throwing here because it doesn't make any sense for a key to arrive from the dictionary
           // fields that doesn't conform to the Sequelize schema. This can only happen if someone inserts an
@@ -160,14 +163,12 @@ export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    return valuesObject;
+    // @ts-expect-error -- We are forcefully returning a single object instead of object[] as this method expects
+    // as we do not have a scan or query API, and we want the user to not unnecessarily iterate
+    // over the users.
+    return result;
   }
 
-  /**
-   * Deletes a row
-   */
   async bulkDelete(
     tableName: TableName,
     identifier: WhereOptions<any>,
@@ -184,7 +185,7 @@ export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
 
     const primaryKey = model.primaryKeyAttribute;
     if (primaryKey == null) {
-      throw new Error('primary key must not be null and not composed');
+      throw new Error('Primary key must not be null and not composed');
     }
 
     // Make sure identifier is an object and has exactly one key
@@ -199,26 +200,89 @@ export class MomentoQueryInterfaceTypescript extends AbstractQueryInterface {
 
     const dictionaryName = (identifier as any)[primaryKey];
 
-    const tableNameObject = isModelStatic(tableName) ? tableName.getTableName()
-      : isString(tableName) ? { tableName }
-        : tableName;
+    const tableNameObject = this.getTableNameObject(tableName);
 
     const conn = await this.sequelize.connectionManager.getConnection() as MomentoConnection;
-    const attributes = model.modelDefinition.attributes;
-    const fields: string[] = [];
-    for (const key of attributes.keys()) {
-      fields.push(key);
-    }
 
-    const response = await conn.cacheClient.dictionaryRemoveFields(tableNameObject.tableName,
-      dictionaryName, fields);
+    const response = await conn.cacheClient.delete(tableNameObject.tableName,
+      dictionaryName);
 
     if (response instanceof CacheDictionarySetFields.Error) {
       throw response.innerException();
     }
 
-    return Promise.resolve({});
+    return {};
 
+  }
+
+  async createTable<M extends Model>(
+    tableNameOrModel: TableName,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    attributes: CreateTableAttributes<M, CreationAttributes<M>>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    options?: QueryInterfaceCreateTableOptions,
+  ) {
+    const tableNameObject = this.getTableNameObject(tableNameOrModel);
+
+    const conn = await this.sequelize.connectionManager.getConnection() as MomentoConnection;
+
+    const response = await conn.cacheClient.createCache(tableNameObject.tableName);
+
+    if (response instanceof CreateCache.Error) {
+      throw new Error('An exception occured while creating cache', response.innerException());
+    }
+  }
+
+  getTableNameObject(tableNameOrModel: TableNameOrModel) {
+    if (tableNameOrModel === undefined) {
+      throw new Error('TableNameOrModel object must not be undefined');
+    }
+
+    return isModelStatic(tableNameOrModel) ? tableNameOrModel.getTableName()
+      : isString(tableNameOrModel) ? { tableName: tableNameOrModel }
+        : tableNameOrModel;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async showAllTables(options?: QueryRawOptions) {
+    const caches: string[] = [];
+    const conn = await this.sequelize.connectionManager.getConnection() as MomentoConnection;
+
+    const listCaches = await conn.cacheClient.listCaches();
+    if (listCaches instanceof ListCaches.Success) {
+      for (const cache of listCaches.getCaches()) {
+        caches.push(cache.getName());
+      }
+    }
+
+    return caches;
+  }
+
+  async dropAllTables(options?: QueryInterfaceDropAllTablesOptions) {
+    const cacheNames = await this.showAllTables(options);
+    const conn = await this.sequelize.connectionManager.getConnection() as MomentoConnection;
+
+    for (const cacheName of cacheNames) {
+      const response = await conn.cacheClient.deleteCache(cacheName);
+      if (response instanceof DeleteCache.Error && response.errorCode() !== MomentoErrorCode.NOT_FOUND_ERROR) {
+        throw new Error(`An exception occured while deleting cache: ${response.message()}`);
+      }
+    }
+  }
+
+  async dropTable(tableNameOrModel: TableName,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    options?: QueryInterfaceDropTableOptions) {
+    const tableNameObject = isModelStatic(tableNameOrModel) ? tableNameOrModel.getTableName()
+      : isString(tableNameOrModel) ? { tableName: tableNameOrModel }
+        : tableNameOrModel;
+    const conn = await this.sequelize.connectionManager.getConnection() as MomentoConnection;
+
+    const response = await conn.cacheClient.deleteCache(tableNameObject.tableName);
+
+    if (response instanceof DeleteCache.Error  && response.errorCode() !== MomentoErrorCode.NOT_FOUND_ERROR) {
+      throw new Error(`An exception occured while deleting cache: ${response.message()}`);
+    }
   }
 
   // Ideally the data-types.ts file should have this logic for individual data types

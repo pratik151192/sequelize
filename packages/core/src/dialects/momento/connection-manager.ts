@@ -4,11 +4,15 @@ import type { Connection, GetConnectionOptions } from '../abstract/connection-ma
 import { AbstractConnectionManager } from '../abstract/connection-manager';
 import type { MomentoDialect } from './index';
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 type Lib = typeof import('@gomomento/sdk');
 
 export interface MomentoConnection extends Connection {
   cacheClient: CacheClient;
 }
+
+const CACHE_AUTH_TOKEN_ENV_VARIABLE_NAME = 'MOMENTO_AUTH_TOKEN';
+const CACHE_DEFAULT_TTL_SECONDS = 60;
 
 export class MomentoConnectionManager extends AbstractConnectionManager<MomentoConnection> {
   private readonly lib: Lib;
@@ -25,12 +29,13 @@ export class MomentoConnectionManager extends AbstractConnectionManager<MomentoC
         cacheClient: await CacheClient.create({
           configuration: Configurations.Laptop.latest(),
           credentialProvider: CredentialProvider.fromEnvironmentVariable({
-            environmentVariableName: 'MOMENTO_AUTH_TOKEN',
+            environmentVariableName: CACHE_AUTH_TOKEN_ENV_VARIABLE_NAME,
           }),
-          defaultTtlSeconds: 60,
+          defaultTtlSeconds: CACHE_DEFAULT_TTL_SECONDS,
         }),
       };
     }
+
     return this.cachedConnection;
   }
 

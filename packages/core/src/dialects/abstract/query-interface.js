@@ -170,6 +170,7 @@ export class AbstractQueryInterface extends AbstractQueryInterfaceTypeScript {
       schema: options.schema,
     });
 
+
     const sql = this.queryGenerator.createTableQuery(tableName, attributes, options);
 
     return await this.sequelize.queryRaw(sql, options);
